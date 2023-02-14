@@ -162,6 +162,20 @@ sram_swap_buffers f1c100s_sram_swap_buffers[] = {
 	{ .size = 0 }  /* End of the table */
 };
 
+/*
+ * A133 should only use SRAM C at 0x24000 because A1 and A2 is not continuous.
+ * FEL use 0x420FC as the top of the stack,
+ * and uses 0x21400 as the top of the IRQ stack. The sp and sp_irq
+ * values checked with thunk are 0x40efc and 0x21400.
+ */
+sram_swap_buffers a133_sram_swap_buffers[] = {
+	/* 0x21000-0x21400 (IRQ stack) */
+	{ .buf1 = 0x21000, .buf2 = 0x43200, .size = 0x0400 },
+	/* 0x40a00-0x421FF (Stack) */
+	{ .buf1 = 0x40a00, .buf2 = 0x43600, .size = 0x1800 },
+	{ .size = 0 }  /* End of the table */
+};
+
 const watchdog_info wd_a10_compat = {
 	.reg_mode = 0x01C20C94,
 	.reg_mode_value = 3,
@@ -445,6 +459,19 @@ soc_info_t soc_info_table[] = {
 		.sid_offset   = 0x200,
 		.watchdog     = &wd_h6_compat,
 	},{
+		.soc_id       = 0x1855, /* Allwinner A133 */
+		.name         = "A133",
+		.spl_addr     = 0x24000,
+		.scratch_addr = 0x25000,
+		.thunk_addr   = 0x43000, .thunk_size = 0x200,
+		.swap_buffers = a133_sram_swap_buffers,
+		.sram_size    = 140 * 1024,
+		.sid_base     = 0x03006000,
+		.sid_offset   = 0x200,
+		.rvbar_reg    = 0x08100040,
+		.watchdog     = &wd_h6_compat,
+	},
+	{
 		.swap_buffers = NULL /* End of the table */
 	}
 };

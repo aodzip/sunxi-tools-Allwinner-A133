@@ -152,6 +152,7 @@ enum sunxi_gpio_number {
 #define SUN50I_H5_GPA_UART0     (2)
 #define SUN50I_H6_GPH_UART0	(2)
 #define SUN50I_H616_GPH_UART0	(2)
+#define SUN50I_A133_GPB_UART0	(2)
 #define SUN50I_R329_GPB_UART0   (2)
 #define SUN50I_A64_GPB_UART0    (4)
 #define SUNXI_GPF_UART0         (4)
@@ -319,6 +320,7 @@ void soc_detection_init(void)
 #define soc_is_r528()	(soc_id == 0x1859)
 #define soc_is_v5()	(soc_id == 0x1721)
 #define soc_is_suniv()	(soc_id == 0x1663)
+#define soc_is_a133()	(soc_id == 0x1855)
 
 /* A10s and A13 share the same ID, so we need a little more effort on those */
 
@@ -419,7 +421,7 @@ void clock_init_uart_r329(void)
 void clock_init_uart(void)
 {
 	if (soc_is_h6() || soc_is_v831() || soc_is_h616() || soc_is_v5() ||
-	    soc_is_a63())
+	    soc_is_a63() || soc_is_a133())
 		clock_init_uart_h6();
 	else if (soc_is_r329() || soc_is_v853() || soc_is_r528())
 		clock_init_uart_r329();
@@ -521,6 +523,10 @@ void gpio_init(void)
 		sunxi_gpio_set_cfgpin(SUNXI_GPE(0), SUNIV_GPE_UART0);
 		sunxi_gpio_set_cfgpin(SUNXI_GPE(1), SUNIV_GPE_UART0);
 		sunxi_gpio_set_pull(SUNXI_GPE(1), SUNXI_GPIO_PULL_UP);
+	} else if (soc_is_a133()) {
+		sunxi_gpio_set_cfgpin(SUNXI_GPB(9), SUN50I_A133_GPB_UART0);
+		sunxi_gpio_set_cfgpin(SUNXI_GPB(10), SUN50I_A133_GPB_UART0);
+		sunxi_gpio_set_pull(SUNXI_GPB(10), SUNXI_GPIO_PULL_UP);
 	} else {
 		/* Unknown SoC */
 		while (1) {}
@@ -603,7 +609,7 @@ int get_boot_device(void)
 	if (soc_is_a64() || soc_is_a80() || soc_is_h5())
 		spl_signature = (void *)0x10004;
 	if (soc_is_h6() || soc_is_v831() || soc_is_h616() || soc_is_v853() ||
-	    soc_is_a63())
+	    soc_is_a63() || soc_is_a133())
 		spl_signature = (void *)0x20004;
 	if (soc_is_r329())
 		spl_signature = (void *)0x100004;
@@ -624,7 +630,7 @@ int get_boot_device(void)
 void bases_init(void)
 {
 	if (soc_is_h6() || soc_is_v831() || soc_is_h616() || soc_is_v5() ||
-	    soc_is_a63()) {
+	    soc_is_a63() || soc_is_a133()) {
 		pio_base = H6_PIO_BASE;
 		uart0_base = H6_UART0_BASE;
 	} else if (soc_is_r329()) {
@@ -690,6 +696,8 @@ int main(void)
 		uart0_puts("Allwinner V5!\n");
 	else if (soc_is_suniv())
 		uart0_puts("Allwinner F1C100s!\n");
+	else if (soc_is_a133())
+		uart0_puts("Allwinner A133!\n");
 	else
 		uart0_puts("unknown Allwinner SoC!\n");
 
