@@ -1,0 +1,8 @@
+SYStem.CPU CortexA53
+SYStem.JtagClock 25.0MHz
+SYStem.Option.TRST ON
+SYStem.Option.ResBreak ON
+SYStem.Option.WaitReset ON
+SYStem.Option.DisMode AUTO
+SYStem.CONFIG.COREDEBUG.Base DAP:0x81410000
+SYStem.CONFIG.CTI1.Base DAP:0x81420000
